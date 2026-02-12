@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reading Quiz: Learning Beyond the Classroom</title>
+    <style>
+        body { font-family: 'Sarabun', sans-serif; background-color: #f4f7f6; color: #2c3e50; line-height: 1.6; padding: 20px; }
+        .container { max-width: 850px; margin: auto; background: white; padding: 40px; border-radius: 15px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); }
+        h1 { color: #1a5276; text-align: center; border-bottom: 3px solid #3498db; padding-bottom: 15px; }
+        
+        /* Reading Section */
+        .reading-box { background: #fdfefe; border: 2px solid #3498db; padding: 25px; margin: 25px 0; border-radius: 10px; position: relative; }
+        .reading-box::before { content: "📖 Reading Passage"; position: absolute; top: -15px; left: 20px; background: #3498db; color: white; padding: 2px 15px; border-radius: 5px; font-weight: bold; }
+
+        /* Student Info Form */
+        .info-form { display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 15px; margin-bottom: 30px; background: #e8f6f3; padding: 20px; border-radius: 10px; }
+        input[type="text"], input[type="number"] { padding: 12px; border: 1px solid #bdc3c7; border-radius: 8px; font-size: 16px; width: 100%; box-sizing: border-box; }
+
+        /* Quiz Styling */
+        .question-card { background: #fff; border: 1px solid #ecf0f1; padding: 25px; margin-bottom: 25px; border-radius: 12px; border-left: 6px solid #1abc9c; transition: 0.3s; }
+        .question-card p { font-weight: bold; font-size: 1.1em; color: #2c3e50; margin-bottom: 15px; }
+        .options { list-style: none; padding: 0; }
+        .options li { margin-bottom: 12px; }
+        .options label { display: block; padding: 10px 15px; border: 1px solid #dcdde1; border-radius: 8px; cursor: pointer; transition: 0.2s; }
+        .options label:hover { background-color: #f1f2f6; border-color: #3498db; }
+        
+        /* Explanation Section */
+        .explanation { display: none; margin-top: 15px; padding: 15px; border-radius: 8px; font-size: 0.95em; line-height: 1.5; border: 1px solid; }
+        .correct-ans { background: #d4edda; color: #155724; border-color: #c3e6cb; }
+        .wrong-ans { background: #f8d7da; color: #721c24; border-color: #f5c6cb; }
+
+        button#submit-btn { display: block; width: 100%; padding: 18px; background: #2980b9; color: white; border: none; border-radius: 10px; font-size: 1.3rem; font-weight: bold; cursor: pointer; transition: 0.3s; margin-top: 20px; }
+        button#submit-btn:hover { background: #1a5276; transform: translateY(-2px); }
+
+        #final-score { display: none; text-align: center; padding: 30px; margin-top: 30px; border-radius: 15px; background: #2c3e50; color: white; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>แบบฝึกหัด Reading Comprehension 4</h1>
+
+    <div class="reading-box">
+        <h3>Learning Beyond the Classroom</h3>
+        <p>Learning does not only happen inside the classroom. Today, students have many opportunities to learn outside school through activities such as online courses, field trips, and self-study. These learning experiences help students develop skills that are not always taught in traditional lessons.</p>
+        <p>For example, joining online courses allows students to study subjects they are interested in at their own pace. Some students learn coding, graphic design, or foreign languages through educational platforms. Field trips also provide real-life experiences that help students understand lessons more clearly, especially in subjects like history and science.</p>
+        <p>However, learning beyond the classroom requires responsibility. Students must manage their time well and stay focused on their goals. Without self-discipline, students may lose motivation or become distracted easily.</p>
+        <p>In conclusion, learning outside the classroom can greatly benefit students if they use their time wisely. It encourages independent learning and prepares students for lifelong education.</p>
+    </div>
+
+    <div class="info-form">
+        <input type="text" id="name" placeholder="ชื่อ-นามสกุล" required>
+        <input type="text" id="class" placeholder="ห้อง (เช่น ม.4/1)" required>
+        <input type="number" id="no" placeholder="เลขที่" required>
+    </div>
+
+    <div id="quiz-area"></div>
+
+    <button id="submit-btn" onclick="checkQuiz()">ส่งคำตอบ (Submit Answers)</button>
+
+    <div id="final-score"></div>
+</div>
+
+<script>
+const quizQuestions = [
+    { q: "What is the main idea of the passage?", a: ["Classroom learning is useless", "Students should only study online", "Learning can happen outside the classroom through various ways", "Teachers should not give homework"], c: 2, e: "เนื้อหาหลักกล่าวถึงโอกาสในการเรียนรู้นอกห้องเรียนผ่านกิจกรรมต่างๆ" },
+    { q: "According to the text, where does learning happen?", a: ["Only in school", "Only online", "Both inside and outside the classroom", "Only during field trips"], c: 2, e: "ประโยคแรกระบุว่าการเรียนรู้ไม่ได้เกิดขึ้นแค่ในห้องเรียนเท่านั้น" },
+    { q: "Which of the following is NOT an activity mentioned for learning outside school?", a: ["Online courses", "Field trips", "Self-study", "Watching TV for fun"], c: 3, e: "การดูทีวีเพื่อความสนุกไม่ได้ถูกระบุว่าเป็นกิจกรรมเพื่อการเรียนรู้ในบทความ" },
+    { q: "How can online courses help students?", a: ["By making them sleep more", "By allowing them to study at their own pace", "By forcing them to go to school", "By giving them free money"], c: 1, e: "คอร์สออนไลน์ช่วยให้นักเรียนเรียนตามความเร็ว (pace) ของตนเองได้" },
+    { q: "What skills can students learn from educational platforms?", a: ["Coding and graphic design", "Eating fast", "Playing video games only", "How to skip school"], c: 0, e: "บทความยกตัวอย่าง coding และ graphic design" },
+    { q: "Field trips are especially useful for which subjects?", a: ["PE and Art", "History and Science", "Math and Thai", "English and Music"], c: 1, e: "ในเนื้อหาระบุว่ามีประโยชน์มากในวิชาประวัติศาสตร์และวิทยาศาสตร์" },
+    { q: "What is a benefit of field trips?", a: ["They are expensive", "They provide real-life experiences", "They take a long time", "They have no teachers"], c: 1, e: "ทัศนศึกษาช่วยมอบประสบการณ์จริง (real-life experiences)" },
+    { q: "What is required for learning beyond the classroom?", a: ["A lot of money", "Responsibility", "A big car", "A new uniform"], c: 1, e: "เนื้อหาระบุว่า 'learning beyond the classroom requires responsibility' (ต้องมีความรับผิดชอบ)" },
+    { q: "What must students manage well during self-study?", a: ["Their money", "Their friends", "Their time", "Their clothes"], c: 2, e: "นักเรียนต้องบริหารจัดการเวลา (time) ให้ดี" },
+    { q: "What happens if a student lacks self-discipline?", a: ["They become smarter", "They stay focused", "They may lose motivation", "They get better grades"], c: 2, e: "หากขาดระเบียบวินัยในตนเอง อาจทำให้เสียแรงจูงใจ (lose motivation)" },
+    { q: "The word 'distracted' in the text most likely means...", a: ["Unable to pay attention", "Very happy", "Extremely smart", "Working hard"], c: 0, e: "Distracted หมายถึง เสียสมาธิ หรือไม่สามารถจดจ่อได้" },
+    { q: "How can students get the most benefit from learning outside school?", a: ["By using their time wisely", "By doing it quickly", "By copying others", "By not having a goal"], c: 0, e: "นักเรียนจะได้รับประโยชน์สูงสุดถ้าใช้เวลาอย่างชาญฉลาด (wisely)" },
+    { q: "Learning outside the classroom encourages...", a: ["Group dependence", "Independent learning", "Laziness", "Forgetting lessons"], c: 1, e: "มันช่วยส่งเสริมการเรียนรู้ด้วยตนเอง (independent learning)" },
+    { q: "What does learning outside the classroom prepare students for?", a: ["Summer holidays", "Eating lunch", "Lifelong education", "Buying tablets"], c: 2, e: "มันช่วยเตรียมนักเรียนสำหรับการเรียนรู้ตลอดชีวิต (lifelong education)" },
+    { q: "The word 'traditional' in 'traditional lessons' refers to...", a: ["Modern technology", "Usual or old-style classroom teaching", "Learning on the moon", "Self-study"], c: 1, e: "Traditional lessons หมายถึงการเรียนการสอนในห้องเรียนแบบปกติดั้งเดิม" },
+    { q: "Which word is a synonym for 'benefit' in the conclusion?", a: ["Harm", "Problem", "Advantage", "Mistake"], c: 2, e: "Benefit มีความหมายว่า ประโยชน์ หรือ ข้อดี (Advantage)" },
+    { q: "Can students learn foreign languages outside school?", a: ["No, impossible", "Yes, through educational platforms", "Only if they travel", "Only in the library"], c: 1, e: "เนื้อความระบุว่าสามารถเรียนผ่านแพลตฟอร์มการศึกษาได้" },
+    { q: "What does 'at their own pace' mean?", a: ["At the same speed as others", "As fast as possible", "At a speed that is comfortable for them", "Only at night"], c: 2, e: "at their own pace หมายถึง ตามความเร็วหรือจังหวะที่แต่ละคนสะดวก" },
+    { q: "Which of the following requires responsibility?", a: ["Learning beyond the classroom", "Only field trips", "Only classroom learning", "Sleeping"], c: 0, e: "การเรียนรู้นอกห้องเรียนทุกรูปแบบล้วนต้องการความรับผิดชอบ" },
+    { q: "The conclusion suggests that students should...", a: ["Stay in the classroom forever", "Balance classroom and outside learning wisely", "Stop going to school", "Only study coding"], c: 1, e: "บทสรุปแนะนำให้ใช้เวลาเรียนรู้นอกห้องเรียนอย่างชาญฉลาดเพื่อประโยชน์สูงสุด" }
+];
+
+const quizArea = document.getElementById('quiz-area');
+quizQuestions.forEach((data, index) => {
+    const card = document.createElement('div');
+    card.className = 'question-card';
+    card.innerHTML = `
+        <p>${index + 1}. ${data.q}</p>
+        <ul class="options">
+            ${data.a.map((opt, i) => `
+                <li><label><input type="radio" name="q${index}" value="${i}"> ${opt}</label></li>
+            `).join('')}
+        </ul>
+        <div id="exp-${index}" class="explanation"></div>
+    `;
+    quizArea.appendChild(card);
+});
+
+function checkQuiz() {
+    const name = document.getElementById('name').value;
+    const sClass = document.getElementById('class').value;
+    const no = document.getElementById('no').value;
+
+    if (!name || !sClass || !no) {
+        alert("กรุณากรอกข้อมูล ชื่อ-ห้อง-เลขที่ ให้ครบถ้วนก่อนส่งนะครับ!");
+        return;
+    }
+
+    let score = 0;
+    quizQuestions.forEach((data, index) => {
+        const selected = document.querySelector(`input[name="q${index}"]:checked`);
+        const expDiv = document.getElementById(`exp-${index}`);
+        expDiv.style.display = 'block';
+        
+        if (selected) {
+            if (parseInt(selected.value) === data.c) {
+                score++;
+                expDiv.className = 'explanation correct-ans';
+                expDiv.innerHTML = "✅ <b>ถูกต้อง!</b>: " + data.e;
+            } else {
+                expDiv.className = 'explanation wrong-ans';
+                expDiv.innerHTML = "❌ <b>ยังไม่ถูก</b> (เฉลย: " + data.a[data.c] + ") <br>คำอธิบาย: " + data.e;
+            }
+        } else {
+            expDiv.className = 'explanation wrong-ans';
+            expDiv.innerHTML = "⚠️ <b>คุณข้ามข้อนี้ไป</b> (เฉลย: " + data.a[data.c] + ") <br>คำอธิบาย: " + data.e;
+        }
+    });
+
+    const finalBox = document.getElementById('final-score');
+    finalBox.style.display = 'block';
+    finalBox.innerHTML = `
+        <h2>สรุปผลคะแนน</h2>
+        <p>นักเรียน: ${name} | ห้อง: ${sClass} | เลขที่: ${no}</p>
+        <p style="font-size: 2em; color: #1abc9c;">ได้คะแนน ${score} / 20</p>
+    `;
+    
+    window.scrollTo({ top: finalBox.offsetTop, behavior: 'smooth' });
+}
+</script>
+
+</body>
+</html>ฆ
